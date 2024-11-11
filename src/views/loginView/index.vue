@@ -2,19 +2,39 @@
   <div class="content">
     <div class="shell">
       <h2 class="title">登录</h2>
-      <input type="text" placeholder="学号" />
-      <input type="password" placeholder="密码" />
+      <input type="text" placeholder="学号" v-model="student_number" />
+      <input type="password" placeholder="密码" v-model="password" />
       <input type="submit" value="登录" @click="goHome" />
     </div>
   </div>
 </template>
 <script lang="ts" setup>
 import { useRouter } from "vue-router";
-
+import { login } from "@/api/modules/sutdent";
+import { ElMessage } from "element-plus";
+import { ref } from "vue";
 const router = useRouter();
 
-const goHome = () => {
-  router.push({ path: "/home" });
+const student_number = ref("");
+const password = ref("");
+
+const goHome = async () => {
+  if (!student_number.value || !password.value) {
+    ElMessage.error("请输入密码或者用户名");
+    return;
+  }
+  let tem = {
+    student_number: student_number.value,
+    password: password.value,
+  };
+  let res: any = await login(tem);
+  if (res.code == 200) {
+    localStorage.setItem("studentInfo", JSON.stringify(res.data));
+    ElMessage.success("登录成功");
+    router.push({ path: "/home" });
+  } else {
+    ElMessage.error(res.message);
+  }
 };
 </script>
 <style scoped lang="scss">

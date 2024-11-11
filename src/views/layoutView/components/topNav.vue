@@ -18,7 +18,7 @@
 
       <el-col :span="2" class="user">
         <el-dropdown @command="handleCommand">
-          <span class="user-name">用户名</span>
+          <span class="user-name">{{ studentInfo.fullName }}</span>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item command="logout">退出登陆</el-dropdown-item>
@@ -30,18 +30,23 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-const router = useRouter()
+const router = useRouter();
 const currentNav = ref(1);
 const routerFun = (index: any) => {
   currentNav.value = index;
 };
 const handleCommand = (command: any) => {
   if (command == "logout") {
-    router.push('/')
+    router.push("/");
   }
 };
+const studentInfo = ref({ fullName: "" });
+onMounted(() => {
+  studentInfo.value = JSON.parse(localStorage.getItem("studentInfo"));
+  console.log(studentInfo);
+});
 </script>
 <style scoped lang="scss">
 .main {
@@ -49,13 +54,13 @@ const handleCommand = (command: any) => {
   border-bottom: 1px solid #dcdfe6;
   background-color: #fff;
   width: 100%;
-
+  z-index: 10;
   .top-nav {
     display: flex;
     justify-content: space-around;
     align-items: center;
     flex-wrap: nowrap;
-
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
     .title {
       font-size: 24px;
       height: 60px;

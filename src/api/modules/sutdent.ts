@@ -16,32 +16,10 @@ export const uploadStudents = (
   );
 };
 
-export const getStudentBycourse = (courseId: any, params: any): any => {
-  return http.get(`/api/courseStudent/courses/${courseId}/students`, params);
+export const getAssignmentsByStudent = (studentId: any) => {
+  return http.get(`/api/assignment/student/${studentId}/all-assignments`);
 };
 
-export const deleteAllStudnet = () => {
-  return http.delete(`/api/courseStudent/allStudents`);
-};
-
-export const deletestudentInCourse = (courseId: any, studentId: any): any => {
-  return http.delete(`/api/courseStudent/${courseId}/${studentId}`);
-};
-/**
- * @function 获取课程
- */
-export const getstudent = (params: any): any => {
-  return http.get("/api/student", params);
-};
-
-export const rePass = (studentId: any): any => {
-  return http.put(`/api/student/rePass/${studentId}`);
-};
-
-export const reName = (studentId: any, updatedData: any): any => {
-  return http.put(`/api/student/reName/${studentId}`, updatedData);
-};
-
-export const deleteStudent = (courseId: any): any => {
-  return http.delete(`/api/student/${courseId}`);
+export const login = (params: any) => {
+  return http.post("/api/student/login", params);
 };

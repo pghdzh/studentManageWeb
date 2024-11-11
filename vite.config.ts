@@ -8,7 +8,7 @@ export default defineConfig({
   base: "./", //不加打包后白屏
   server: {
     host: "localhost",
-    port: 9528,
+    port: 9526,
     open: true,
   },
   resolve: {

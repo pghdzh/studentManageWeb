@@ -14,6 +14,13 @@ const router = createRouter({
     {
       path: "/home",
       component: () => import("@/views/layoutView/index.vue"),
+      redirect: "/subAssigment",
+      children: [
+        {
+          path: "/subAssigment",
+          component: () => import("@/views/subAssigmentView/index.vue"),
+        },
+      ],
     },
   ],
   scrollBehavior() {
