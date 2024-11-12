@@ -22,27 +22,67 @@
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item command="logout">退出登陆</el-dropdown-item>
+              <el-dropdown-item command="editPass">修改密码</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown></el-col
       >
     </el-row>
+    <el-dialog v-model="editDia" title="修改密码" width="500" center>
+      <div style="width: 100%; display: flex; justify-content: center">
+        <el-input
+          v-model="newPass"
+          style="width: 240px"
+          placeholder="输入密码"
+        />
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="editDia = false">取消</el-button>
+          <el-button type="primary" @click="editPassReq"> 确定 </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { editPass } from "@/api/modules/sutdent";
+import { ElMessage } from "element-plus";
 const router = useRouter();
 const currentNav = ref(1);
 const routerFun = (index: any) => {
   currentNav.value = index;
 };
+
+const editDia = ref(false);
+
 const handleCommand = (command: any) => {
   if (command == "logout") {
     router.push("/");
   }
+  if (command == "editPass") {
+    editDia.value = true;
+  }
 };
-const studentInfo = ref({ fullName: "" });
+const newPass = ref("");
+const editPassReq = async () => {
+  let tem = {
+    newPassword: newPass.value,
+  };
+
+  let res: any = await editPass(studentInfo.value.student_id, tem);
+  if (res.code == 200) {
+    ElMessage.success("修改密码成功，请重新登录");
+    editDia.value = false;
+    router.push("/");
+  } else {
+    ElMessage.error(res.message);
+  }
+};
+
+const studentInfo = ref({ fullName: "", student_id: null });
 onMounted(() => {
   studentInfo.value = JSON.parse(localStorage.getItem("studentInfo"));
   console.log(studentInfo);

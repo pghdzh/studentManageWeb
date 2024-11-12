@@ -23,3 +23,7 @@ export const getAssignmentsByStudent = (studentId: any) => {
 export const login = (params: any) => {
   return http.post("/api/student/login", params);
 };
+
+export const editPass = (studentId: any, params: any) => {
+  return http.put(`/api/student/editPass/${studentId}`, params);
+};

@@ -1,5 +1,6 @@
 <template>
   <div class="content">
+    <div class="snow" ref="snowflakeRef"></div>
     <div class="selectCourse">
       <div class="cat">
         <smallCat message="喵~" />
@@ -61,6 +62,7 @@ import { ref, watch } from "vue";
 import { ElMessage } from "element-plus";
 import { getAssignmentsByStudent } from "@/api/modules/sutdent";
 import { onMounted } from "vue";
+import initSnowflake from "./threeInit/initSnowflake";
 const assignmentId = ref("");
 const options = ref([]);
 const unsubmittedCount = ref(0); //未提交的作业个数
@@ -120,7 +122,9 @@ watch(assignmentId, (newId) => {
 });
 const uploadData = ref({}); //上传参数带学生id
 const studentInfo = ref({ student_id: null });
+const snowflakeRef = ref();
 onMounted(() => {
+  initSnowflake(snowflakeRef);
   studentInfo.value = JSON.parse(localStorage.getItem("studentInfo"));
   uploadData.value = { studentId: studentInfo.value.student_id };
   getAssignmentsByStudentReq(studentInfo.value.student_id);
@@ -130,6 +134,14 @@ onMounted(() => {
 .content {
   width: 100%;
   padding-top: 40px;
+  .snow {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
   .selectCourse {
     width: 80%;
     margin-left: 10%;
