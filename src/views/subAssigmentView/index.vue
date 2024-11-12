@@ -6,17 +6,8 @@
       </div>
       <div class="title">选择作业</div>
       <div class="leftselect">
-        <el-select
-          v-model="assignmentId"
-          placeholder="选择作业"
-          style="width: 240px"
-        >
-          <el-option
-            v-for="item in options"
-            :key="item.id"
-            :label="item.title"
-            :value="item.id"
-          />
+        <el-select v-model="assignmentId" placeholder="选择作业" style="width: 240px">
+          <el-option v-for="item in options" :key="item.id" :label="item.title" :value="item.id" />
         </el-select>
         <div class="assignmentNum" v-if="unsubmittedCount">
           你还有{{ unsubmittedCount }}个作业未提交
@@ -32,15 +23,8 @@
           <div style="min-height: 200px">
             {{ selectedAssignment.description }}
           </div>
-          <el-upload
-            :action="uploadUrl"
-            :data="uploadData"
-            :before-upload="beforeUpload"
-            :on-success="handleUploadSuccess"
-            :on-error="handleUploadError"
-            :show-file-list="false"
-            name="file"
-          >
+          <el-upload :action="uploadUrl" :data="uploadData" :before-upload="beforeUpload"
+            :on-success="handleUploadSuccess" :on-error="handleUploadError" :show-file-list="false" name="file">
             <el-button type="primary">提交作业</el-button>
           </el-upload>
         </div>
@@ -52,15 +36,29 @@
           <div>作业评价:暂无</div>
         </div>
       </div>
+      <div class="damoArea">
+        <el-tooltip effect="light" :content="blessing" placement="right-start">
+          <moneyDamo v-if="damoRandNum == 0" />
+          <peachFlowerDamo v-if="damoRandNum == 1" />
+          <pickPeopleDamo v-if="damoRandNum == 2" />
+          <safeDamo v-if="damoRandNum == 3" />
+        </el-tooltip>
+      </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
 import smallCat from "@/components/SmallCat/index.vue";
+import moneyDamo from '@/components/luckDamo/money.vue'
+import peachFlowerDamo from "@/components/luckDamo/peachFlower.vue"
+import pickPeopleDamo from '@/components/luckDamo/pickPeople.vue'
+import safeDamo from '@/components/luckDamo/safe.vue'
 import { ref, watch } from "vue";
 import { ElMessage } from "element-plus";
 import { getAssignmentsByStudent } from "@/api/modules/sutdent";
 import { onMounted } from "vue";
+import { blessSafeArr, wealthBlessings, peachBlossomBlessings, relationshipBlessings } from './blessArr';
+
 const assignmentId = ref("");
 const options = ref([]);
 const unsubmittedCount = ref(0); //未提交的作业个数
@@ -118,18 +116,40 @@ watch(assignmentId, (newId) => {
   selectedAssignment.value =
     options.value.find((item) => item.id === newId) || null;
 });
+
+const damoRandNum = ref(0)//随机达摩
+const blessing = ref('')//
+const randomDamoFun = () => {
+  damoRandNum.value = Math.floor(Math.random() * 4);
+  if (damoRandNum.value == 0) {
+    blessing.value = wealthBlessings[Math.floor(Math.random() * 10)];
+  }
+  else if (damoRandNum.value == 1) {
+    blessing.value = peachBlossomBlessings[Math.floor(Math.random() * 10)];
+  }
+  else if (damoRandNum.value == 2) {
+    blessing.value = relationshipBlessings[Math.floor(Math.random() * 10)];
+  }
+  else{
+    blessing.value = blessSafeArr[Math.floor(Math.random() * 10)];
+  }
+}
+
 const uploadData = ref({}); //上传参数带学生id
 const studentInfo = ref({ student_id: null });
+
 onMounted(() => {
-  studentInfo.value = JSON.parse(localStorage.getItem("studentInfo"));
-  uploadData.value = { studentId: studentInfo.value.student_id };
-  getAssignmentsByStudentReq(studentInfo.value.student_id);
+  randomDamoFun()
+  // studentInfo.value = JSON.parse(localStorage.getItem("studentInfo"));
+  // uploadData.value = { studentId: studentInfo.value.student_id };
+  // getAssignmentsByStudentReq(studentInfo.value.student_id);
 });
 </script>
 <style scoped lang="scss">
 .content {
   width: 100%;
   padding-top: 40px;
+
   .selectCourse {
     width: 80%;
     margin-left: 10%;
@@ -145,6 +165,7 @@ onMounted(() => {
       left: 0;
       top: -50px;
     }
+
     .title {
       font-size: 24px;
       font-weight: 700;
@@ -154,9 +175,11 @@ onMounted(() => {
       width: 120px;
       -webkit-text-fill-color: transparent;
     }
+
     .leftselect {
       display: flex;
       align-items: center;
+
       .assignmentNum {
         margin-left: 100px;
       }
@@ -173,6 +196,7 @@ onMounted(() => {
     border-radius: 10px;
     box-shadow: 0 10px 30px #00000020;
     position: relative;
+
     .title {
       font-size: 24px;
       font-weight: 700;
@@ -182,17 +206,27 @@ onMounted(() => {
       width: 120px;
       -webkit-text-fill-color: transparent;
     }
+
     .assignmentArea {
       display: flex;
       justify-content: space-between;
+
       .leftAssignment {
         min-height: 200px;
         width: 45%;
       }
+
       .rightAssignment {
         min-height: 200px;
         width: 45%;
       }
+    }
+
+    .damoArea {
+      position: absolute;
+      right: 0;
+      bottom: -50px;
+      transform: scale(0.5)
     }
   }
 }
