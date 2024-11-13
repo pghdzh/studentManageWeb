@@ -49,7 +49,6 @@ watch(isThree, async () => {
 });
 
 onMounted(() => {
-
   let isThreeStr = localStorage.getItem("isThree");
   isThree.value = isThreeStr ? isThreeStr === "true" : false; // 如果没有值，默认为 false
 });

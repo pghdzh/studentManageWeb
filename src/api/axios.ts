@@ -7,8 +7,10 @@ import axios, {
 import { ElMessage } from "element-plus";
 import { ResultData } from "./modules/type";
 
+const url1 = "http://localhost:3000";
+const url2 = "http://1.94.189.79:3000";
 const config: any = {
-  baseURL: "http://localhost:3000",
+  baseURL: url2,
   timeout: 30000,
 };
 

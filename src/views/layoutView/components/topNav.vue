@@ -58,6 +58,9 @@ const router = useRouter();
 const currentNav = ref(1);
 const routerFun = (index: any) => {
   currentNav.value = index;
+  if(index != 1){
+    ElMessage.warning('还在做别急')
+  }
 };
 
 const editDia = ref(false);
