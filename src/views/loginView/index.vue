@@ -1,5 +1,6 @@
 <template>
   <div class="content">
+    <div class="night" v-if="isThree" ref="nightRef"></div>
     <div class="shell">
       <h2 class="title">登录</h2>
       <input type="text" placeholder="学号" v-model="student_number" />
@@ -12,7 +13,9 @@
 import { useRouter } from "vue-router";
 import { login } from "@/api/modules/sutdent";
 import { ElMessage } from "element-plus";
-import { ref } from "vue";
+import { onMounted, ref, watch, nextTick } from "vue";
+import initNight from "./threeInit/initNight";
+
 const router = useRouter();
 
 const student_number = ref("");
@@ -36,6 +39,20 @@ const goHome = async () => {
     ElMessage.error(res.message);
   }
 };
+const nightRef = ref();
+const isThree = ref(false);
+watch(isThree, async () => {
+  if (isThree.value) {
+    await nextTick(); // 等待 DOM 更新
+    initNight(nightRef);
+  }
+});
+
+onMounted(() => {
+
+  let isThreeStr = localStorage.getItem("isThree");
+  isThree.value = isThreeStr ? isThreeStr === "true" : false; // 如果没有值，默认为 false
+});
 </script>
 <style scoped lang="scss">
 .content {
@@ -45,10 +62,18 @@ const goHome = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
+  .night {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+  }
   .shell {
     width: 350px;
     padding: 40px;
-
+    z-index: 11;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -82,7 +107,7 @@ const goHome = async () => {
     }
 
     input::placeholder {
-      color: #92a7eb;
+      color: #007bff;
     }
     input[type="submit"] {
       background-color: #007bff;

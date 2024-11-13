@@ -23,6 +23,9 @@
             <el-dropdown-menu>
               <el-dropdown-item command="logout">退出登陆</el-dropdown-item>
               <el-dropdown-item command="editPass">修改密码</el-dropdown-item>
+              <el-dropdown-item command="isThree"
+                >{{ isThree ? "关闭" : "开启" }}动态背景</el-dropdown-item
+              >
             </el-dropdown-menu>
           </template>
         </el-dropdown></el-col
@@ -34,6 +37,7 @@
           v-model="newPass"
           style="width: 240px"
           placeholder="输入密码"
+          maxlength="12"
         />
       </div>
       <template #footer>
@@ -57,13 +61,18 @@ const routerFun = (index: any) => {
 };
 
 const editDia = ref(false);
-
+const isThree = ref(false);
 const handleCommand = (command: any) => {
   if (command == "logout") {
     router.push("/");
   }
   if (command == "editPass") {
     editDia.value = true;
+  }
+  if (command == "isThree") {
+    isThree.value = !isThree.value;
+    localStorage.setItem("isThree", String(isThree.value));
+    window.location.reload(); // 刷新页面
   }
 };
 const newPass = ref("");
@@ -84,6 +93,8 @@ const editPassReq = async () => {
 
 const studentInfo = ref({ fullName: "", student_id: null });
 onMounted(() => {
+  let isThreeStr = localStorage.getItem("isThree");
+  isThree.value = isThreeStr ? isThreeStr === "true" : false; // 如果没有值，默认为 false
   studentInfo.value = JSON.parse(localStorage.getItem("studentInfo"));
   console.log(studentInfo);
 });

@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <div class="snow" ref="snowflakeRef"></div>
+    <div class="snow" v-if="isThree" ref="snowflakeRef"></div>
     <div class="selectCourse">
       <div class="cat">
         <smallCat message="喵~" />
@@ -42,7 +42,11 @@
             :show-file-list="false"
             name="file"
           >
-            <el-button type="primary">提交作业</el-button>
+            <el-button
+              type="primary"
+              :disabled="selectedAssignment.status != '未提交'"
+              >提交作业</el-button
+            >
           </el-upload>
         </div>
         <div class="rightAssignment">
@@ -50,18 +54,36 @@
           <div style="margin-bottom: 20px">
             作业状态:{{ selectedAssignment.status }}
           </div>
-          <div>作业评价:暂无</div>
+          <div>作业评价:{{ selectedAssignment.feedback }}</div>
         </div>
+      </div>
+      <div class="damoArea">
+        <el-tooltip effect="light" :content="blessing" placement="right-start">
+          <moneyDamo v-if="damoRandNum == 0" />
+          <peachFlowerDamo v-if="damoRandNum == 1" />
+          <pickPeopleDamo v-if="damoRandNum == 2" />
+          <safeDamo v-if="damoRandNum == 3" />
+        </el-tooltip>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
 import smallCat from "@/components/SmallCat/index.vue";
-import { ref, watch } from "vue";
+import moneyDamo from "@/components/luckDamo/money.vue";
+import peachFlowerDamo from "@/components/luckDamo/peachFlower.vue";
+import pickPeopleDamo from "@/components/luckDamo/pickPeople.vue";
+import safeDamo from "@/components/luckDamo/safe.vue";
+import { ref, watch, nextTick } from "vue";
 import { ElMessage } from "element-plus";
 import { getAssignmentsByStudent } from "@/api/modules/sutdent";
 import { onMounted } from "vue";
+import {
+  blessSafeArr,
+  wealthBlessings,
+  peachBlossomBlessings,
+  relationshipBlessings,
+} from "./blessArr";
 import initSnowflake from "./threeInit/initSnowflake";
 const assignmentId = ref("");
 const options = ref([]);
@@ -113,6 +135,7 @@ const selectedAssignment = ref({
   description: null,
   due_date: null,
   status: "",
+  feedback: "",
 }); // 存储对应的作业对象
 const uploadUrl = ref(""); //上传地址带作业id
 watch(assignmentId, (newId) => {
@@ -120,11 +143,38 @@ watch(assignmentId, (newId) => {
   selectedAssignment.value =
     options.value.find((item) => item.id === newId) || null;
 });
+
+const damoRandNum = ref(0); //随机达摩
+const blessing = ref(""); //
+const randomDamoFun = () => {
+  damoRandNum.value = Math.floor(Math.random() * 4);
+  if (damoRandNum.value == 0) {
+    blessing.value = wealthBlessings[Math.floor(Math.random() * 10)];
+  } else if (damoRandNum.value == 1) {
+    blessing.value = peachBlossomBlessings[Math.floor(Math.random() * 10)];
+  } else if (damoRandNum.value == 2) {
+    blessing.value = relationshipBlessings[Math.floor(Math.random() * 10)];
+  } else {
+    blessing.value = blessSafeArr[Math.floor(Math.random() * 10)];
+  }
+};
+
+const isThree = ref(false);
+
+watch(isThree, async () => {
+  if (isThree.value) {
+    await nextTick(); // 等待 DOM 更新
+    initSnowflake(snowflakeRef);
+  }
+});
 const uploadData = ref({}); //上传参数带学生id
 const studentInfo = ref({ student_id: null });
 const snowflakeRef = ref();
+
 onMounted(() => {
-  initSnowflake(snowflakeRef);
+  let isThreeStr = localStorage.getItem("isThree");
+  isThree.value = isThreeStr ? isThreeStr === "true" : false; // 如果没有值，默认为 false
+  randomDamoFun();
   studentInfo.value = JSON.parse(localStorage.getItem("studentInfo"));
   uploadData.value = { studentId: studentInfo.value.student_id };
   getAssignmentsByStudentReq(studentInfo.value.student_id);
@@ -157,6 +207,7 @@ onMounted(() => {
       left: 0;
       top: -50px;
     }
+
     .title {
       font-size: 24px;
       font-weight: 700;
@@ -166,9 +217,11 @@ onMounted(() => {
       width: 120px;
       -webkit-text-fill-color: transparent;
     }
+
     .leftselect {
       display: flex;
       align-items: center;
+
       .assignmentNum {
         margin-left: 100px;
       }
@@ -185,6 +238,7 @@ onMounted(() => {
     border-radius: 10px;
     box-shadow: 0 10px 30px #00000020;
     position: relative;
+
     .title {
       font-size: 24px;
       font-weight: 700;
@@ -194,17 +248,27 @@ onMounted(() => {
       width: 120px;
       -webkit-text-fill-color: transparent;
     }
+
     .assignmentArea {
       display: flex;
       justify-content: space-between;
+
       .leftAssignment {
         min-height: 200px;
         width: 45%;
       }
+
       .rightAssignment {
         min-height: 200px;
         width: 45%;
       }
+    }
+
+    .damoArea {
+      position: absolute;
+      right: 0;
+      bottom: -50px;
+      transform: scale(0.5);
     }
   }
 }
